@@ -1,8 +1,18 @@
 <?php
 /**
  Plugin Name: Caldera Forms Video Overlays
-
  */
+
+add_action( 'caldera_forms_includes_complete', 'cf_video_overlays_init' );
+
+/**
+ * Make plugin go
+ *
+ * @since 0.0.1
+ */
+function cf_video_overlays_init(){
+	new CF_Video_Overlays();
+}
 
 /**
  * Is this an supported source type?
