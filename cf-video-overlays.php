@@ -11,6 +11,7 @@ add_action( 'caldera_forms_includes_complete', 'cf_video_overlays_init' );
  * @since 0.0.1
  */
 function cf_video_overlays_init(){
+	//need to add CF 1.5.0.7 or later check here
 	new CF_Video_Overlays();
 }
 
