@@ -11,8 +11,10 @@ add_action( 'caldera_forms_includes_complete', 'cf_video_overlays_init' );
  * @since 0.0.1
  */
 function cf_video_overlays_init(){
-	//need to add CF 1.5.0.7 or later check here
-	new CF_Video_Overlays();
+	//You must have CF 1.5.0.7 or you will not go to space today
+	if (  class_exists( 'Caldera_Forms_Render_Modals' ) ) {
+		new CF_Video_Overlays();
+	}
 }
 
 /**
@@ -41,13 +43,23 @@ class CF_Video_Overlays {
 
 	const SOURCE_ATT = 'video_source';
 
+	/**
+	 * @var array
+	 */
+	protected $modal_forms;
 
+	/**
+	 * CF_Video_Overlays constructor.
+	 *
+	 * @since 0.0.1
+	 */
 	public function __construct(){
 		add_filter( 'shortcode_atts_caldera_form', array( $this, 'shortcode_atts' ), 10, 4 );
-		add_filter( 'shortcode_atts_caldera_forms_modal', array( $this, 'shortcode_atts' ), 10, 4 );
+		add_filter( 'shortcode_atts_caldera_form_modal', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10, 4 );
 		add_filter( 'cf_video_overlays_allowed_sources', array( $this, 'allowed_sources' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
+		$this->modal_forms = array();
 	}
 
 	/**
@@ -82,6 +94,10 @@ class CF_Video_Overlays {
 			}else{
 				$allowed[ self::SOURCE_ATT ] = 'youtube';
 			}
+
+			if( 'caldera_form_modal' === $shortcode && ! empty(  $atts[ 'id' ] ) ){
+				$this->modal_forms[ Caldera_Forms_Render_Util::get_current_form_count() ] = $atts[ 'id' ];
+			}
 		}
 
 		return $allowed;
@@ -101,7 +117,7 @@ class CF_Video_Overlays {
 	 */
 	public function maybe_load( $output, $entry_id, $form, $atts ){
 
-		if( isset( $atts[ self::ID_ATT ] ) ){
+		if( isset( $atts[ self::ID_ATT ] ) || $this->is_modal_form_to_load( $form[ 'ID' ] ) ){
 
 			remove_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10 );
 
@@ -112,11 +128,37 @@ class CF_Video_Overlays {
 			wp_enqueue_style( 'cf_video_overlay_style' );
 
 			$form_html = Caldera_Forms::render_form( $form );
+			$video_form_html = include( plugin_dir_path( __FILE__ ) . '/video-templates/' . $atts['video_source'] . '.php' );
+			if( $this->is_modal_form_to_load( $form[ 'ID' ] ) ){
+				$output = Caldera_Forms_Render_Modals::modal_button( $atts, 'MODAL!', $form );
+				$modal_id = Caldera_Forms_Render_Modals::modal_id( $form );
+				$modal_body = Caldera_Forms_Render_Modals::modal_body( $video_form_html, $modal_id, 'cf-video-overlay-modal-body' );
+				Caldera_Forms_Render_Modals::add_to_footer( $modal_body );
+			}else{
+				$output = $video_form_html;
+			}
 
-			include( plugin_dir_path( __FILE__ ) . '/video-templates/' . $atts['video_source'] . '.php' );
+
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Check if is a modal form we should use
+	 *
+	 * @since 0.0.2
+	 *
+	 * @param string $form_id Form ID
+	 *
+	 * @return bool
+	 */
+	protected function is_modal_form_to_load( $form_id ){
+		$current = Caldera_Forms_Render_Util::get_current_form_count();
+		if( isset( $this->modal_forms[ $current ] ) && $this->modal_forms[ $current ] == $form_id ){
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -125,7 +167,6 @@ class CF_Video_Overlays {
 	 * @since 0.0.1
 	 */
 	public function load_scripts(){
-		//going to need to do some enqueuing here
 		$allowed = array();
 		$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
 		foreach( $allowed as $key => $value ) {

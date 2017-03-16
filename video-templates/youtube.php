@@ -6,3 +6,4 @@ $output = '<div id="cf_youtube_overlay_wrapper" class="cf_video_overlays_embed-r
 	$output .= '<div class="cf_video_overlays_youtube_form">' . $form_html . '</div>';
 	$output .= '<div class="cf_youtube_overlay_wrapper"><div id="cf_youtube_overlay_container" data-id="' . $atts['video_id'] . '"></div></div>';
 $output .= '</div>';
+return $output;
