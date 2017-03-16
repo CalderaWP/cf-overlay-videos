@@ -58,7 +58,7 @@ class CF_Video_Overlays {
 		add_filter( 'shortcode_atts_caldera_form_modal', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10, 4 );
 		add_filter( 'cf_video_overlays_allowed_sources', array( $this, 'allowed_sources' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
 		$this->modal_forms = array();
 	}
 
@@ -166,7 +166,7 @@ class CF_Video_Overlays {
 	 *
 	 * @since 0.0.1
 	 */
-	public function load_scripts(){
+	public function register_scripts(){
 		$allowed = array();
 		$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
 		foreach( $allowed as $key => $value ) {
