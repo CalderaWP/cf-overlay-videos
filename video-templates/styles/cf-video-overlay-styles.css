@@ -1,0 +1,50 @@
+/** Responsive **/
+.cf_video_overlays_embed-responsive {
+    position: relative;
+    display: block;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.cf_video_overlays_embed-responsive .cf_video_overlays_embed-responsive-item,
+.cf_video_overlays_embed-responsive iframe,
+.cf_video_overlays_embed-responsive embed,
+.cf_video_overlays_embed-responsive object,
+.cf_video_overlays_embed-responsive video{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.cf_video_overlays_embed-responsive.cf_video_overlays_embed-responsive-16by9 {
+    padding-bottom: 56.25%;
+}
+.cf_video_overlays_embed-responsive.cf_video_overlays_embed-responsive-4by3 {
+    padding-bottom: 75%;
+}
+
+
+/** Youtube Styling **/
+#cf_youtube_overlay_wrapper {
+    position: relative;
+    width: 100%;
+}
+#cf_youtube_overlay_wrapper * {
+    box-sizing: border-box;
+}
+
+.cf_video_overlays_youtube_form {
+    background: rgba( 255,255,255,0.8 );
+    display: none;
+    left: 0;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}

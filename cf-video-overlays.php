@@ -24,10 +24,9 @@ function cf_video_overlays_init(){
  *
  * @return bool
  */
-function cf_video_overlays_allowed_source( $source_type){
-	$allowed = apply_filters( 'cf_video_overlays_allowed_sources', array(
-		'youtube'
-	) );
+function cf_video_overlays_allowed_source( $source_type ){
+	$allowed = array();
+	$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
 
 	return in_array( $source_type, $allowed );
 }
@@ -47,6 +46,20 @@ class CF_Video_Overlays {
 		add_filter( 'shortcode_atts_caldera_form', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'shortcode_atts_caldera_forms_modal', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10, 4 );
+		add_filter( 'cf_video_overlays_allowed_sources', array( $this, 'allowed_sources' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
+	}
+
+	/**
+	 * Filter Callback for allowed sources
+	 *
+	 * @param $allowed
+	 *
+	 * @return array]
+	 */
+	function allowed_sources( $allowed ) {
+		$allowed[] = 'youtube';
+		return $allowed;
 	}
 
 	/**
@@ -63,7 +76,7 @@ class CF_Video_Overlays {
 	 */
 	public function shortcode_atts(  $allowed, $pairs, $atts, $shortcode ){
 		if( isset( $atts[ self::ID_ATT ] ) ){
-			$allowed[ self::SOURCE_ATT ] = $atts[ self::SOURCE_ATT ];
+			$allowed[ self::ID_ATT ] = $atts[ self::ID_ATT ];
 			if( isset( $allowed[ self::SOURCE_ATT ] ) && cf_video_overlays_allowed_source( $allowed[ self::SOURCE_ATT ] )  ){
 				$allowed[ self::SOURCE_ATT ] = $atts[ self::SOURCE_ATT ];
 			}else{
@@ -87,15 +100,20 @@ class CF_Video_Overlays {
 	 * @return string
 	 */
 	public function maybe_load( $output, $entry_id, $form, $atts ){
+
 		if( isset( $atts[ self::ID_ATT ] ) ){
 
 			remove_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10 );
 
-			add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
+			if( 'youtube' == $atts['video_source'] ) {
+				wp_enqueue_script( 'youtube-iframe-api' );
+			}
+			wp_enqueue_script( 'cf_video_overlay_script-' . $atts['video_source'] );
+			wp_enqueue_style( 'cf_video_overlay_style' );
 
 			$form_html = Caldera_Forms::render_form( $form );
 
-			$output = 'Hi Roy'; //include the partial with the video player/overlay
+			include( plugin_dir_path( __FILE__ ) . '/video-templates/' . $atts['video_source'] . '.php' );
 		}
 
 		return $output;
@@ -108,6 +126,15 @@ class CF_Video_Overlays {
 	 */
 	public function load_scripts(){
 		//going to need to do some enqueuing here
+		$allowed = array();
+		$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
+		foreach( $allowed as $key => $value ) {
+			wp_register_script( 'cf_video_overlay_script-' . $value, plugin_dir_url( __FILE__ ) . '/video-templates/scripts/cf-source-' . $value . '.js', array('jquery'), null, 'all' );
+		}
+		wp_register_style( 'cf_video_overlay_style', plugin_dir_url( __FILE__ ) . '/video-templates/styles/cf-video-overlay-styles.css', array(), null, 'all' );
+		wp_register_script( 'youtube-iframe-api', 'https://www.youtube.com/iframe_api', array( 'cf_video_overlay_script-youtube' ), null, false );
+
 	}
+
 
 }
