@@ -25,7 +25,7 @@ function cf_video_overlays_init(){
  * @return bool
  */
 function cf_video_overlays_allowed_source( $source_type ){
-	$allowed = [];
+	$allowed = array();
 	$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
 
 	return in_array( $source_type, $allowed );
