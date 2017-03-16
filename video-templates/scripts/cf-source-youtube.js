@@ -1,14 +1,14 @@
 var $ = jQuery,
-    video_container = $('#cf_youtube_overlay_container'),
-    form_container = $('.cf_youtube_overlay_form'),
-    yt_id = video_container.data('id'),
+    $video_container = $('#cf_youtube_overlay_container'),
+    $form_container = $('.cf_video_overlays_youtube_form'),
+    yt_id = $video_container.data('id'),
     player;
 
 
 $('body').on('submit', '.cf_youtube_overlay_form form', function() {
 
     document.cookie = "_cf_yt_video_" + yt_id + "=" + yt_id + ";path=/";
-    form_container.fadeOut(function(){
+    $form_container.fadeOut(function(){
         if( player ) {
             player.playVideo();
         }
@@ -33,7 +33,7 @@ function onPlayerStateChange( event ) {
 
         if( !check_video_cookie( yt_id ) ) {
             player.pauseVideo();
-            form_container.fadeIn();
+            $form_container.fadeIn();
         }
     }
 }

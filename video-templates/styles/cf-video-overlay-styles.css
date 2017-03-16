@@ -1,16 +1,16 @@
 /** Responsive **/
-.embed-responsive {
+.cf_video_overlays_embed-responsive {
     position: relative;
     display: block;
     height: 0;
     padding: 0;
     overflow: hidden;
 }
-.embed-responsive .embed-responsive-item,
-.embed-responsive iframe,
-.embed-responsive embed,
-.embed-responsive object,
-.embed-responsive video{
+.cf_video_overlays_embed-responsive .cf_video_overlays_embed-responsive-item,
+.cf_video_overlays_embed-responsive iframe,
+.cf_video_overlays_embed-responsive embed,
+.cf_video_overlays_embed-responsive object,
+.cf_video_overlays_embed-responsive video{
     position: absolute;
     top: 0;
     bottom: 0;
@@ -18,10 +18,10 @@
     width: 100%;
     height: 100%;
 }
-.embed-responsive.embed-responsive-16by9 {
+.cf_video_overlays_embed-responsive.cf_video_overlays_embed-responsive-16by9 {
     padding-bottom: 56.25%;
 }
-.embed-responsive.embed-responsive-4by3 {
+.cf_video_overlays_embed-responsive.cf_video_overlays_embed-responsive-4by3 {
     padding-bottom: 75%;
 }
 
@@ -35,7 +35,7 @@
     box-sizing: border-box;
 }
 
-.cf_youtube_overlay_form {
+.cf_video_overlays_youtube_form {
     background: rgba( 255,255,255,0.8 );
     display: none;
     left: 0;
