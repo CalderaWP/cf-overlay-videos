@@ -15,6 +15,7 @@ function cf_video_overlays_init(){
 	if (  class_exists( 'Caldera_Forms_Render_Modals' ) ) {
 		new CF_Video_Overlays();
 	}
+
 }
 
 /**
@@ -26,13 +27,28 @@ function cf_video_overlays_init(){
  *
  * @return bool
  */
-function cf_video_overlays_allowed_source( $source_type ){
-	$allowed = array();
-	$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
+function cf_video_overlays_allowed_provider( $source_type ){
+	return in_array( $source_type, cf_video_overlays_allowed_providers() );
 
-	return in_array( $source_type, $allowed );
 }
 
+/**
+ * Get the allowed video providers
+ *
+ * @since 0.0.2
+ *
+ * @return array
+ */
+function cf_video_overlays_allowed_providers(){
+	/**
+	 * Filter for the allowed video types
+	 *
+	 * @since 0.0.2
+	 *
+	 * @param array $allowed_types
+	 */
+	return apply_filters( 'cf_video_overlays_allowed_providers', array() );
+}
 
 
 
@@ -57,7 +73,7 @@ class CF_Video_Overlays {
 		add_filter( 'shortcode_atts_caldera_form', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'shortcode_atts_caldera_form_modal', array( $this, 'shortcode_atts' ), 10, 4 );
 		add_filter( 'caldera_forms_pre_render_form', array( $this, 'maybe_load' ), 10, 4 );
-		add_filter( 'cf_video_overlays_allowed_sources', array( $this, 'allowed_sources' ) );
+		add_filter( 'cf_video_overlays_allowed_providers', array( $this, 'allowed_sources' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
 		$this->modal_forms = array();
 	}
@@ -89,7 +105,7 @@ class CF_Video_Overlays {
 	public function shortcode_atts(  $allowed, $pairs, $atts, $shortcode ){
 		if( isset( $atts[ self::ID_ATT ] ) ){
 			$allowed[ self::ID_ATT ] = $atts[ self::ID_ATT ];
-			if( isset( $allowed[ self::SOURCE_ATT ] ) && cf_video_overlays_allowed_source( $allowed[ self::SOURCE_ATT ] )  ){
+			if( isset( $allowed[ self::SOURCE_ATT ] ) && cf_video_overlays_allowed_provider( $allowed[ self::SOURCE_ATT ] )  ){
 				$allowed[ self::SOURCE_ATT ] = $atts[ self::SOURCE_ATT ];
 			}else{
 				$allowed[ self::SOURCE_ATT ] = 'youtube';
@@ -167,8 +183,7 @@ class CF_Video_Overlays {
 	 * @since 0.0.1
 	 */
 	public function register_scripts(){
-		$allowed = array();
-		$allowed = apply_filters( 'cf_video_overlays_allowed_sources', $allowed );
+		$allowed = cf_video_overlays_allowed_providers();
 		foreach( $allowed as $key => $value ) {
 			wp_register_script( 'cf_video_overlay_script-' . $value, plugin_dir_url( __FILE__ ) . '/video-templates/scripts/cf-source-' . $value . '.js', array('jquery'), null, 'all' );
 		}
