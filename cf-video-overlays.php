@@ -188,7 +188,13 @@ class CF_Video_Overlays {
 			wp_register_script( 'cf_video_overlay_script-' . $value, plugin_dir_url( __FILE__ ) . '/video-templates/scripts/cf-source-' . $value . '.js', array('jquery'), null, 'all' );
 		}
 		wp_register_style( 'cf_video_overlay_style', plugin_dir_url( __FILE__ ) . '/video-templates/styles/cf-video-overlay-styles.css', array(), null, 'all' );
-		wp_register_script( 'youtube-iframe-api', 'https://www.youtube.com/iframe_api', array( 'cf_video_overlay_script-youtube' ), null, false );
+
+		$protocol = 'https';
+		if( ! is_ssl() ){
+			$protocol = 'http';
+		}
+
+		wp_register_script( 'youtube-iframe-api', "$protocol://www.youtube.com/iframe_api", array( 'cf_video_overlay_script-youtube' ), null, false );
 
 	}
 
