@@ -6,6 +6,39 @@
 add_action( 'caldera_forms_includes_complete', 'cf_video_overlays_init' );
 
 /**
+ * Render a video overlay form
+ *
+ * @since 0.0.2
+ *
+ * @param array $atts Shortcode atts, with id, video_id and video_source
+ * @param bool $modal Optional. If is modal or not. Default is false
+ *
+ * @return string
+ */
+function cf_video_overlays_render( $atts, $modal = false ){
+	$form = Caldera_Forms_Forms::get_form( $atts );
+	if( 'youtube' == $atts['video_source'] ) {
+		wp_enqueue_script( 'youtube-iframe-api' );
+	}
+	wp_enqueue_script( 'cf_video_overlay_script-' . $atts['video_source'] );
+	wp_enqueue_style( 'cf_video_overlay_style' );
+
+	$form_html = Caldera_Forms::render_form( $form );
+	$video_form_html = include( plugin_dir_path( __FILE__ ) . '/video-templates/' . $atts['video_source'] . '.php' );
+	if( $modal ){
+		$modal_id = Caldera_Forms_Render_Modals::modal_id( $form );
+		$output = Caldera_Forms_Render_Modals::modal_button( $atts, '', $form, $modal_id );
+		$modal_body = Caldera_Forms_Render_Modals::modal_body( $video_form_html, $modal_id, 'cf-video-overlay-modal-body' );
+		Caldera_Forms_Render_Modals::add_to_footer( $modal_body );
+	}else{
+		$output = $video_form_html;
+
+	}
+
+	return $output;
+
+}
+/**
  * Make plugin go
  *
  * @since 0.0.1
@@ -143,17 +176,7 @@ class CF_Video_Overlays {
 			wp_enqueue_script( 'cf_video_overlay_script-' . $atts['video_source'] );
 			wp_enqueue_style( 'cf_video_overlay_style' );
 
-			$form_html = Caldera_Forms::render_form( $form );
-			$video_form_html = include( plugin_dir_path( __FILE__ ) . '/video-templates/' . $atts['video_source'] . '.php' );
-			if( $this->is_modal_form_to_load( $form[ 'ID' ] ) ){
-				$output = Caldera_Forms_Render_Modals::modal_button( $atts, 'MODAL!', $form );
-				$modal_id = Caldera_Forms_Render_Modals::modal_id( $form );
-				$modal_body = Caldera_Forms_Render_Modals::modal_body( $video_form_html, $modal_id, 'cf-video-overlay-modal-body' );
-				Caldera_Forms_Render_Modals::add_to_footer( $modal_body );
-			}else{
-				$output = $video_form_html;
-			}
-
+			$output = cf_video_overlays_render( $atts, $this->is_modal_form_to_load( $atts[ 'id'] ) );
 
 		}
 
