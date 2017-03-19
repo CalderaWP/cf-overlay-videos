@@ -5,7 +5,7 @@ var $ = jQuery,
     player;
 
 
-$('body').on('submit', '.cf_youtube_overlay_form form', function() {
+$('body').on('submit', '.cf_video_overlays_youtube_form form', function() {
 
     document.cookie = "_cf_yt_video_" + yt_id + "=" + yt_id + ";path=/";
     $form_container.fadeOut(function(){
