@@ -48,3 +48,8 @@
     width: 100%;
     z-index: 100;
 }
+
+/** Modal **/
+.remodal .cf_video_overlays_embed-responsive {
+    margin-bottom: 28px;
+}
